@@ -1,0 +1,17 @@
+pyspark==3.5.3
+apache-sedona==1.7.1
+geopandas>=1.0
+pyogrio
+pyarrow
+shapely>=2.0
+requests
+pyyaml
+python-dotenv
+pandas
+scikit-learn
+lightgbm
+matplotlib
+streamlit
+groq
+pandera
+pytest
