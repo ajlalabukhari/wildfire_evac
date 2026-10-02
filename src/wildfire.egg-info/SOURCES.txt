@@ -1,0 +1,16 @@
+LICENSE
+README.md
+pyproject.toml
+src/wildfire/__init__.py
+src/wildfire/config.py
+src/wildfire/run_pipeline.py
+src/wildfire/spark_session.py
+src/wildfire.egg-info/PKG-INFO
+src/wildfire.egg-info/SOURCES.txt
+src/wildfire.egg-info/dependency_links.txt
+src/wildfire.egg-info/top_level.txt
+src/wildfire/pipeline/__init__.py
+src/wildfire/pipeline/bronze.py
+src/wildfire/pipeline/gold.py
+src/wildfire/pipeline/silver.py
+tests/test_silver.py
