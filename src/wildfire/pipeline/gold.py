@@ -5,11 +5,12 @@ from wildfire.config import ROOT, load_config
 from wildfire.spark_session import get_spark
 
 
-def register(spark, silver: Path, name: str) -> bool:
+def register(spark, silver: Path, name: str, geo: bool = True) -> bool:
     path = silver / f"{name}.parquet"
     if not path.exists():
         return False
-    spark.read.format("geoparquet").load(str(path)).createOrReplaceTempView(name)
+    fmt = "geoparquet" if geo else "parquet"
+    spark.read.format(fmt).load(str(path)).createOrReplaceTempView(name)
     return True
 
 
@@ -18,8 +19,9 @@ def main() -> None:
     silver, gold = ROOT / cfg["paths"]["silver"], ROOT / cfg["paths"]["gold"]
     gold.mkdir(parents=True, exist_ok=True)
     spark = get_spark()
-    for t in ["tracts", "roads", "acs"]:
-        register(spark, silver, t)
+    register(spark, silver, "tracts")
+    register(spark, silver, "roads")
+    register(spark, silver, "acs", geo=False)
     has_fhsz = register(spark, silver, "fhsz")
     has_fires = register(spark, silver, "fire_perimeters")
 

@@ -34,27 +34,39 @@ def fetch_acs(cfg: dict, dest: Path) -> None:
     if dest.exists():
         print(f"skip (exists): {dest}")
         return
+    counties = ",".join(cfg["county_fips"])
     params = {
         "get": ",".join(["NAME"] + ACS_VARS),
         "for": "tract:*",
-        "in": f"state:{cfg['state_fips']} county:{cfg['county_fips']}",
+        "in": f"state:{cfg['state_fips']} county:{counties}",
     }
     if key := os.getenv("CENSUS_API_KEY"):
         params["key"] = key
     url = f"https://api.census.gov/data/{cfg['acs_year']}/acs/acs5"
-    rows = requests.get(url, params=params, timeout=120).json()
+    print(f"downloading ACS for counties {counties}")
+    r = requests.get(url, params=params, timeout=120)
+    if r.status_code != 200:
+        raise RuntimeError(f"Census API error {r.status_code}: {r.text[:300]}")
+    rows = r.json()
     dest.parent.mkdir(parents=True, exist_ok=True)
     pd.DataFrame(rows[1:], columns=rows[0]).to_csv(dest, index=False)
+    print(f"ACS: {len(rows) - 1} tracts")
 
 
 def main() -> None:
     load_dotenv()
     cfg = load_config()
     bronze = ROOT / cfg["paths"]["bronze"]
-    st, co, yr = cfg["state_fips"], cfg["county_fips"], cfg["tiger_year"]
+    st, yr = cfg["state_fips"], cfg["tiger_year"]
     base = f"https://www2.census.gov/geo/tiger/TIGER{yr}"
-    fetch_zip(f"{base}/ROADS/tl_{yr}_{st}{co}_roads.zip", bronze / "tiger_roads")
+
+    # Roads are published one file per county -> one subfolder per county
+    for co in cfg["county_fips"]:
+        fetch_zip(f"{base}/ROADS/tl_{yr}_{st}{co}_roads.zip", bronze / "tiger_roads" / co)
+
+    # Tracts are published one file per state
     fetch_zip(f"{base}/TRACT/tl_{yr}_{st}_tract.zip", bronze / "tiger_tracts")
+
     fetch_acs(cfg, bronze / "acs" / "acs_tracts.csv")
     print("bronze done. Reminder: CAL FIRE files go in data/bronze/manual/ (see config).")
 
