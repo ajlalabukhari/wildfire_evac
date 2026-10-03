@@ -15,3 +15,5 @@ streamlit
 anthropic
 pandera
 pytest
+folium
+streamlit-folium
