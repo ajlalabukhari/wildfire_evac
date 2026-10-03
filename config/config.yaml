@@ -1,25 +1,25 @@
-# Change county here; everything downstream follows.
-state_fips: "06"        # California
-county_fips: "007"      # Butte County
+# Change counties here; everything downstream follows.
+state_fips: "06"                # California
+county_fips: ["007", "013"]     # Butte, Contra Costa
 tiger_year: 2024
-acs_year: 2023          # ACS 5-year estimates
-crs: "EPSG:3310"        # California Albers (units = meters)
+acs_year: 2023                  # ACS 5-year estimates
+crs: "EPSG:3310"                # California Albers (units = meters)
 
 paths:
   bronze: data/bronze
   silver: data/silver
   gold: data/gold
 
-# CAL FIRE files are downloaded by hand from https://frap.fire.ca.gov/mapping/gis-data/
-# Unzip into data/bronze/manual/ and set the file names below.
 calfire:
-  fhsz_file: data/bronze/manual/fhsz.shp          # Fire Hazard Severity Zones
-  fhsz_class_col: FHSZ_Description                # column holding Moderate/High/Very High
+  fhsz_files:
+    - {path: data/bronze/manual/fhsz_lra_p1/FHSZLRA25_Phase1_v1/geodatabase/FHSZLRA25_Phase1_v1.gdb, layer: FHSZLRA25_Phase1_v1}
+    - {path: data/bronze/manual/fhsz_lra_p2/FHSZLRA25_Phase2_v1/Geodatabase/FHSZLRA25_Phase2_v1.gdb, layer: FHSZLRA25_Phase2_v1}
+  fhsz_class_col: FHSZ_Description
   high_hazard_values: ["High", "Very High"]
-  perimeters_file: data/bronze/manual/fire_perimeters.gdb
-  perimeters_layer: null                          # set if the .gdb has several layers
+  perimeters_file: data/bronze/manual/fire25_1/fire25_1.gdb
+  perimeters_layer: firep25_1
   perimeters_year_col: YEAR_
   perimeters_min_year: 2015
 
 llm:
-  model: llama-3.3-70b-versatile                  # check console.groq.com for current models
+  model: claude-haiku-4-5-20251001
