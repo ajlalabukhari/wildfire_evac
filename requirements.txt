@@ -12,6 +12,8 @@ scikit-learn
 lightgbm
 matplotlib
 streamlit
-groq
+anthropic
 pandera
 pytest
+folium
+streamlit-folium
